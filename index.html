@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src blob:">
+<title>QWIZERO Studio</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- Верхняя панель -->
+  <header id="topbar">
+    <div id="brand">
+      <img id="brand-logo" src="../assets/logo.png" alt="">
+      <span id="brand-name">QWIZERO <b>Studio</b></span>
+    </div>
+    <nav id="menus"></nav>
+    <button id="theme-toggle" title="Тема: тёмная / светлая">◐</button>
+    <div id="modeswitch">
+      <button id="mode-photo" class="ms-btn active" title="Редактор изображений">Фото</button>
+      <button id="mode-motion" class="ms-btn" title="Моушн-графика и анимация">Моушн</button>
+    </div>
+  </header>
+
+  <!-- Панель параметров инструмента -->
+  <div id="toolopts"></div>
+
+  <!-- Центральная часть -->
+  <div id="middle">
+    <aside id="toolbar"></aside>
+
+    <main id="workspace">
+      <canvas id="view"></canvas>
+      <div id="statusbar">
+        <span id="st-doc">—</span>
+        <span id="st-pos"></span>
+        <span id="st-zoom">100%</span>
+      </div>
+    </main>
+
+    <aside id="panels">
+      <div class="panel-tabs">
+        <button class="ptab active" data-tab="layers">Слои</button>
+        <button class="ptab" data-tab="adjust">Коррекция</button>
+        <button class="ptab" data-tab="color">Цвет</button>
+      </div>
+
+      <div id="tab-layers" class="tabpage active">
+        <div class="layer-controls">
+          <select id="blend-mode" title="Режим наложения">
+            <option value="source-over">Обычные</option>
+            <option value="multiply">Умножение</option>
+            <option value="screen">Осветление</option>
+            <option value="overlay">Перекрытие</option>
+            <option value="darken">Затемнение</option>
+            <option value="lighten">Замена светлым</option>
+            <option value="color-dodge">Осветление основы</option>
+            <option value="color-burn">Затемнение основы</option>
+            <option value="hard-light">Жёсткий свет</option>
+            <option value="soft-light">Мягкий свет</option>
+            <option value="difference">Разница</option>
+            <option value="exclusion">Исключение</option>
+            <option value="hue">Цветовой тон</option>
+            <option value="saturation">Насыщенность</option>
+            <option value="color">Цветность</option>
+            <option value="luminosity">Яркость</option>
+          </select>
+          <label class="op-label">Непрозр. <input type="range" id="layer-opacity" min="0" max="100" value="100"></label>
+        </div>
+        <div id="layers-list"></div>
+        <div class="layer-btns">
+          <button id="lb-new" title="Новый слой">＋</button>
+          <button id="lb-dup" title="Дублировать">⧉</button>
+          <button id="lb-mask" title="Добавить маску">◐</button>
+          <button id="lb-up" title="Выше">▲</button>
+          <button id="lb-down" title="Ниже">▼</button>
+          <button id="lb-merge" title="Объединить с нижним">⤓</button>
+          <button id="lb-del" title="Удалить">✕</button>
+        </div>
+      </div>
+
+      <div id="tab-adjust" class="tabpage">
+        <div class="adj-group">
+          <label>Яркость <input type="range" class="adj" data-k="brightness" min="-100" max="100" value="0"><span class="adj-v">0</span></label>
+          <label>Контраст <input type="range" class="adj" data-k="contrast" min="-100" max="100" value="0"><span class="adj-v">0</span></label>
+          <label>Экспозиция <input type="range" class="adj" data-k="exposure" min="-100" max="100" value="0"><span class="adj-v">0</span></label>
+          <label>Насыщенность <input type="range" class="adj" data-k="saturation" min="-100" max="100" value="0"><span class="adj-v">0</span></label>
+          <label>Тон <input type="range" class="adj" data-k="hue" min="-180" max="180" value="0"><span class="adj-v">0</span></label>
+          <label>Температура <input type="range" class="adj" data-k="temperature" min="-100" max="100" value="0"><span class="adj-v">0</span></label>
+          <label>Сочность <input type="range" class="adj" data-k="vibrance" min="-100" max="100" value="0"><span class="adj-v">0</span></label>
+          <label>Резкость <input type="range" class="adj" data-k="sharpen" min="0" max="100" value="0"><span class="adj-v">0</span></label>
+        </div>
+        <div class="adj-btns">
+          <button id="adj-apply">Применить</button>
+          <button id="adj-reset">Сброс</button>
+        </div>
+        <p class="hint">Коррекция применяется к активному слою (с учётом выделения).</p>
+      </div>
+
+      <div id="tab-color" class="tabpage">
+        <div id="color-boxes">
+          <div id="fg-box" title="Основной цвет"></div>
+          <div id="bg-box" title="Фоновый цвет"></div>
+          <button id="color-swap" title="Поменять местами (X)">⇄</button>
+          <button id="color-default" title="По умолчанию (D)">◧</button>
+        </div>
+        <input type="color" id="color-picker" value="#ffffff">
+        <div id="color-sliders">
+          <label>R <input type="range" id="cs-r" min="0" max="255" value="255"><span id="cs-rv">255</span></label>
+          <label>G <input type="range" id="cs-g" min="0" max="255" value="255"><span id="cs-gv">255</span></label>
+          <label>B <input type="range" id="cs-b" min="0" max="255" value="255"><span id="cs-bv">255</span></label>
+        </div>
+        <div id="swatches"></div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Таймлайн (режим Моушн) -->
+  <div id="timeline-wrap" class="hidden">
+    <div id="tl-toolbar">
+      <button id="tl-play" title="Play/Pause (Пробел)">▶</button>
+      <button id="tl-tostart" title="В начало">⏮</button>
+      <span id="tl-time">0.00 / 10.00 с</span>
+      <label>fps <input id="tl-fps" type="number" value="30" min="1" max="120"></label>
+      <label>длит., с <input id="tl-dur" type="number" value="10" min="1" max="600"></label>
+      <select id="tl-ease" title="Интерполяция">
+        <option value="linear">Линейная</option>
+        <option value="ease">Плавная</option>
+      </select>
+      <span class="sep"></span>
+      <button id="tl-newcomp">Новая композиция</button>
+      <button id="tl-fromdoc" title="Создать композицию из слоёв фотодокумента">Из документа</button>
+      <button id="tl-addsolid">Плашка</button>
+      <button id="tl-addtext">Текст</button>
+      <span class="sep"></span>
+      <button id="tl-export-webm">Экспорт WebM</button>
+      <button id="tl-export-mp4">Экспорт MP4</button>
+    </div>
+    <div id="tl-props">
+      <span id="tl-selname">Слой не выбран</span>
+      <label>X <input id="mp-x" type="number" value="0"></label>
+      <label>Y <input id="mp-y" type="number" value="0"></label>
+      <label>Масштаб % <input id="mp-scale" type="number" value="100"></label>
+      <label>Поворот° <input id="mp-rot" type="number" value="0"></label>
+      <label>Непрозр. % <input id="mp-op" type="number" value="100" min="0" max="100"></label>
+      <label>Размытие <input id="mp-blur" type="number" value="0" min="0" max="100"></label>
+      <button id="tl-key-all" title="Ключевой кадр для всех свойств в текущей позиции">◆ Ключ</button>
+      <button id="tl-key-del" title="Удалить ключи в текущей позиции">◆✕</button>
+    </div>
+    <div id="tl-body">
+      <div id="tl-layers"></div>
+      <div id="tl-scroll">
+        <div id="tl-ruler"></div>
+        <div id="tl-trackarea"></div>
+        <div id="tl-playhead"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="modal-root"></div>
+
+<script src="js/theme.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/motion.js"></script>
+</body>
+</html>
